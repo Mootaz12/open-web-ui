@@ -99,7 +99,10 @@ resource "aws_spot_instance_request" "open_web_ui" {
   vpc_security_group_ids = [aws_security_group.open_web_ui_ssh.id, aws_security_group.open_web_ui_http.id]
   subnet_id      = aws_subnet.open_web_ui.id
   wait_for_fulfillment = true
-  user_data_base64 = base64encode(file("${path.module}/scripts/provision_vm.sh"))
+  user_data_base64 = base64encode(templatefile("${path.module}/scripts/provision_vm.sh", {
+    open_web_ui_user=var.open_web_ui_user,
+    open_web_ui_password = random_password.open_web_ui_password.result,
+  }))
   tags = {
     Name = "open-web-ui"
   }
